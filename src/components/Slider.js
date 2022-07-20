@@ -19,7 +19,7 @@ const Slider = () => {
       clearInterval(intervalId);
     }
     return () => clearInterval(intervalId);
-  }, [currentImgIndex, isAutoPlay]);
+  }, [currentImgIndex, isAutoPlay, allImages.length]);
 
   //Handle previous Image
   const showPrevImage = () => {
@@ -57,6 +57,7 @@ const Slider = () => {
     images[allImages.length] = {
       url: "",
       title: "new",
+      isAdd: false
     };
     setAllImages(images);
   };
@@ -69,25 +70,31 @@ const Slider = () => {
   const handleSettings = (e) => {
     setIsShowSettings(!isShowSettings);
   };
+  const saveImage = (e,url, index) => {
+    let images = [...allImages];
+    images[index].url = url;
+    images[index].isAdd = true;
+    setAllImages(images);
+  }
   return (
     <div>
       <h1> Hello Slider! </h1>
       <section className={classes.wrapper}>
         <div className={classes.slideshow}>
           <div className={classes.slider}>
-            {allImages.map((key, index) => {
-              return (
-                index === currentImgIndex && (
-                  <img key={index} src={key.url} alt={key.title} />
-                )
-              );
+            {allImages.filter(key => key.isAdd ).map((key,index) => {
+              if(index === currentImgIndex && key.isAdd ) {
+              return( 
+                <img key={index} src={key.url} alt={key.title} />
+              )
+              }
             })}
           </div>
           <div className={classes.arrows}>
-            <i onClick={showPrevImage} id="Prev" aria-hidden="true">
+            <i onClick={showPrevImage} aria-hidden="true">
               ❮
             </i>
-            <i id="Next" onClick={showNextImage} aria-hidden="true">
+            <i onClick={showNextImage} aria-hidden="true">
               ❯
             </i>
           </div>
@@ -132,6 +139,8 @@ const Slider = () => {
                   >
                     Remove
                   </button>
+                  {(!key.isAdd && key.url !== "") &&
+                  <button type = " button" onClick = {(e) => saveImage(e, key.url,ind)} className = {classes.addBtn}> Save Image </button> }
                   <br />
                 </div>
               );
